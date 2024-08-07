@@ -1,1 +1,25 @@
-pbsed
+#!/bin/bash
+#
+#/ Original source: https://github.com/rtomayko/dotfiles
+#
+#/ Usage: pbsed [<options>] <pattern>
+#/ Run sed(1) on the contents of the pboard and put the result back
+#/ on the pboard. All sed options and arguments are supported.
+# shellcheck disable=SC2002
+set -e
+set -o pipefail
+
+if [[ "$(uname -s)" != 'Darwin' ]]; then
+  echo 'Sorry, this script only works on macOS'
+  exit 1
+fi
+
+# print help/usage with no pattern/args
+test $# -eq 0 -o "$1" = "--help" && {
+  grep '^#/' < "$0" | cut -c4-
+  exit 0
+}
+
+# pipe pboard through sed and then back again
+pbpaste | sed "$@" | pbcopy
+exit $?
